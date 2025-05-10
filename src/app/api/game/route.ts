@@ -4,6 +4,9 @@ import { quizCreationSchema } from "@/schemas/forms/quiz";
 import { z } from "zod";
 import { addGame, getGame, Game, Question } from "@/lib/gameStore";
 
+export const runtime = "nodejs";
+export const maxDuration = 60; // Maximum allowed on Vercel hobby plan
+
 // Fallback questions for MCQ
 const mcqFallbackQuestions = [
   {
@@ -70,21 +73,21 @@ const openEndedFallbackQuestions = [
 export async function POST(req: Request, res: Response) {
   try {
     console.log("Game API: Starting POST request");
-    
+
     // Generate a unique ID for the game
     const gameId = uuidv4();
     console.log("Game API: Generated game ID", { gameId });
-    
+
     // Parse the request body
     const body = await req.json();
     console.log("Game API: Request body", body);
-    
+
     // Validate the request body
     const { topic, type, amount } = quizCreationSchema.parse(body);
     console.log("Game API: Parsed schema", { topic, type, amount });
-    
+
     // Get questions based on the type
-    const gameQuestions: Question[] = type === "mcq" 
+    const gameQuestions: Question[] = type === "mcq"
       ? mcqFallbackQuestions.slice(0, amount).map(q => ({
           id: uuidv4(),
           gameId,
@@ -100,7 +103,7 @@ export async function POST(req: Request, res: Response) {
           answer: q.answer,
           questionType: "open_ended"
         }));
-    
+
     // Create a game object
     const game: Game = {
       id: gameId,
@@ -110,13 +113,13 @@ export async function POST(req: Request, res: Response) {
       timeStarted: new Date().toISOString(),
       questions: gameQuestions
     };
-    
+
     // Add the game to the store
     addGame(game);
-    
+
     console.log("Game API: Game created", { gameId });
     console.log("Game API: Questions created", { count: gameQuestions.length });
-    
+
     // Return the game ID
     return NextResponse.json({ gameId }, { status: 200 });
   } catch (error) {
@@ -129,9 +132,9 @@ export async function POST(req: Request, res: Response) {
     } else {
       console.error("Game creation error:", error);
       return NextResponse.json(
-        { 
-          error: "An unexpected error occurred.", 
-          details: error instanceof Error ? error.message : String(error) 
+        {
+          error: "An unexpected error occurred.",
+          details: error instanceof Error ? error.message : String(error)
         },
         { status: 500 }
       );
@@ -142,30 +145,30 @@ export async function POST(req: Request, res: Response) {
 export async function GET(req: Request, res: Response) {
   try {
     console.log("Game API: Starting GET request");
-    
+
     // Get the game ID from the URL
     const url = new URL(req.url);
     const gameId = url.searchParams.get("gameId");
     console.log("Game API: Game ID from URL", { gameId });
-    
+
     if (!gameId) {
       return NextResponse.json(
         { error: "You must provide a game id." },
         { status: 400 }
       );
     }
-    
+
     // Get the game from the store
     const game = getGame(gameId);
     console.log("Game API: Retrieved game", { found: !!game });
-    
+
     if (!game) {
       return NextResponse.json(
         { error: "Game not found." },
         { status: 404 }
       );
     }
-    
+
     // Return the game
     return NextResponse.json(
       { game },
@@ -174,7 +177,7 @@ export async function GET(req: Request, res: Response) {
   } catch (error) {
     console.error("Game API: Error in GET handler", error);
     return NextResponse.json(
-      { 
+      {
         error: "An unexpected error occurred.",
         details: error instanceof Error ? error.message : String(error)
       },

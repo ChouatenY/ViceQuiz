@@ -1,0 +1,9 @@
+.git
+.github
+.next
+node_modules
+README.md
+.env
+.env.*
+!.env.example
+prisma/dev.db

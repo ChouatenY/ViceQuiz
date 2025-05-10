@@ -13,6 +13,9 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["string-similarity"],
   },
+  serverRuntimeConfig: {
+    PROJECT_ROOT: process.cwd(),
+  },
 };
 
 export default nextConfig;

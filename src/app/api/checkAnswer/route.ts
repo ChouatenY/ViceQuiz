@@ -3,6 +3,9 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import stringSimilarity from "string-similarity";
 
+export const runtime = "nodejs";
+export const maxDuration = 60; // Maximum allowed on Vercel hobby plan
+
 // Simple in-memory storage for answers
 const answers = new Map<string, { isCorrect?: boolean, percentageCorrect?: number }>();
 
