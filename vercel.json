@@ -1,0 +1,12 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "env": {
+    "GEMINI_API_KEY": "AIzaSyC3p0HW2dXQAjwKOHVoP7j_Y2uvvSVRjVY",
+    "NEXTAUTH_SECRET": "quizzy-app-secret-key-for-production"
+  }
+}

@@ -1,17 +1,15 @@
-import { PrismaClient } from "@prisma/client";
+// This file is kept for compatibility with existing imports
+// We're not using Prisma anymore, but keeping this file to avoid breaking imports
+
 import "server-only";
 
-declare global {
-  // eslint-disable-next-line no-var, no-unused-vars
-  var cachedPrisma: PrismaClient;
-}
-
-export let prisma: PrismaClient;
-if (process.env.NODE_ENV === "production") {
-  prisma = new PrismaClient();
-} else {
-  if (!global.cachedPrisma) {
-    global.cachedPrisma = new PrismaClient();
-  }
-  prisma = global.cachedPrisma;
-}
+// Mock Prisma client for compatibility
+export const prisma = {
+  // Add any mock methods that might be needed
+  game: {
+    count: async () => 0,
+  },
+  topic_count: {
+    findMany: async () => [],
+  },
+};
