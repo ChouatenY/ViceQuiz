@@ -7,18 +7,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import WordCloud from "../WordCloud";
-import { prisma } from "@/lib/db";
 
 type Props = {};
 
 const HotTopicsCard = async (props: Props) => {
-  const topics = await prisma.topic_count.findMany({});
-  const formattedTopics = topics.map((topic) => {
-    return {
-      text: topic.topic,
-      value: topic.count,
-    };
-  });
+  // Default topics in case of database error
+  let formattedTopics = [
+    { text: "JavaScript", value: 5 },
+    { text: "React", value: 4 },
+    { text: "TypeScript", value: 3 },
+    { text: "Node.js", value: 2 },
+    { text: "HTML", value: 2 },
+    { text: "CSS", value: 1 },
+  ];
+
+  // We're using default topics since we've removed the database
   return (
     <Card className="col-span-4">
       <CardHeader>

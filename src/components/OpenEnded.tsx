@@ -50,9 +50,11 @@ const OpenEnded = ({ game }: Props) => {
         filledAnswer = filledAnswer.replace("_____", input.value);
         input.value = "";
       });
-      const payload: z.infer<typeof checkAnswerSchema> = {
+      const payload = {
         questionId: currentQuestion.id,
         userInput: filledAnswer,
+        correctAnswer: currentQuestion.answer,
+        questionType: "open_ended"
       };
       const response = await axios.post(`/api/checkAnswer`, payload);
       return response.data;
@@ -113,7 +115,7 @@ const OpenEnded = ({ game }: Props) => {
           {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
         </div>
         <Link
-          href={`/statistics/${game.id}`}
+          href={`/statistics/${game.id}?data=${encodeURIComponent(JSON.stringify(game))}`}
           className={cn(buttonVariants({ size: "lg" }), "mt-2")}
         >
           View Statistics

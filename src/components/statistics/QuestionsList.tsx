@@ -10,7 +10,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Question } from "@prisma/client";
+// Define our own Question type since we're not using Prisma
+type Question = {
+  id: string;
+  question: string;
+  answer: string;
+  userAnswer?: string;
+  isCorrect?: boolean;
+  percentageCorrect?: number;
+  questionType: 'mcq' | 'open_ended';
+};
+
 type Props = {
   questions: Question[];
 };

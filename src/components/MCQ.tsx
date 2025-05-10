@@ -40,15 +40,28 @@ const MCQ = ({ game }: Props) => {
   const options = React.useMemo(() => {
     if (!currentQuestion) return [];
     if (!currentQuestion.options) return [];
-    return JSON.parse(currentQuestion.options as string) as string[];
+
+    // Handle both array and JSON string formats
+    if (Array.isArray(currentQuestion.options)) {
+      return currentQuestion.options as string[];
+    } else {
+      try {
+        return JSON.parse(currentQuestion.options as string) as string[];
+      } catch (error) {
+        console.error("Error parsing options:", error);
+        return [];
+      }
+    }
   }, [currentQuestion]);
 
   const { toast } = useToast();
   const { mutate: checkAnswer, isLoading: isChecking } = useMutation({
     mutationFn: async () => {
-      const payload: z.infer<typeof checkAnswerSchema> = {
+      const payload = {
         questionId: currentQuestion.id,
         userInput: options[selectedChoice],
+        correctAnswer: currentQuestion.answer,
+        questionType: "mcq"
       };
       const response = await axios.post(`/api/checkAnswer`, payload);
       return response.data;
@@ -140,7 +153,7 @@ const MCQ = ({ game }: Props) => {
           {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
         </div>
         <Link
-          href={`/statistics/${game.id}`}
+          href={`/statistics/${game.id}?data=${encodeURIComponent(JSON.stringify(game))}`}
           className={cn(buttonVariants({ size: "lg" }), "mt-2")}
         >
           View Statistics

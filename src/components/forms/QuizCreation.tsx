@@ -29,6 +29,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import LoadingQuestions from "../LoadingQuestions";
+import { v4 as uuidv4 } from 'uuid';
+import { generateMCQQuestions, generateOpenEndedQuestions } from "@/lib/aiQuestions";
 
 type Props = {
   topic: string;
@@ -43,8 +45,18 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
   const { toast } = useToast();
   const { mutate: getQuestions, isLoading } = useMutation({
     mutationFn: async ({ amount, topic, type }: Input) => {
-      const response = await axios.post("/api/game", { amount, topic, type });
-      return response.data;
+      console.log("Submitting quiz creation request:", { amount, topic, type });
+      try {
+        const response = await axios.post("/api/game", { amount, topic, type });
+        console.log("Quiz creation response:", response.data);
+        return response.data;
+      } catch (error) {
+        console.error("Quiz creation error:", error);
+        if (axios.isAxiosError(error) && error.response) {
+          console.error("Error response data:", error.response.data);
+        }
+        throw error;
+      }
     },
   });
 
@@ -54,35 +66,77 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
       topic: topicParam,
       type: "mcq",
       amount: 3,
+      difficulty: "intermediate",
     },
   });
 
   const onSubmit = async (data: Input) => {
-    setShowLoader(true);
-    getQuestions(data, {
-      onError: (error) => {
-        setShowLoader(false);
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 500) {
-            toast({
-              title: "Error",
-              description: "Something went wrong. Please try again later.",
-              variant: "destructive",
-            });
-          }
+    try {
+      setShowLoader(true);
+
+      // Generate a unique ID for the game
+      const gameId = uuidv4();
+
+      // Generate questions based on the topic, type, and difficulty
+      let questions;
+      if (data.type === "mcq") {
+        questions = await generateMCQQuestions(data.topic, data.amount, data.difficulty);
+      } else {
+        questions = await generateOpenEndedQuestions(data.topic, data.amount, data.difficulty);
+      }
+
+      // Format the questions for the game
+      const formattedQuestions = data.type === "mcq"
+        ? questions.map(q => ({
+            id: uuidv4(),
+            gameId,
+            question: q.question,
+            answer: q.answer,
+            options: [q.option1, q.option2, q.option3, q.answer].sort(() => Math.random() - 0.5),
+            questionType: "mcq" as const
+          }))
+        : questions.map(q => ({
+            id: uuidv4(),
+            gameId,
+            question: q.question,
+            answer: q.answer,
+            questionType: "open_ended" as const
+          }));
+
+      // Create a game object
+      const game = {
+        id: gameId,
+        userId: "local-user",
+        topic: data.topic,
+        gameType: data.type,
+        timeStarted: new Date().toISOString(),
+        questions: formattedQuestions
+      };
+
+      // Encode the game data as a JSON string
+      const gameData = encodeURIComponent(JSON.stringify(game));
+
+      // Show the loading animation for a moment
+      setFinishedLoading(true);
+
+      // After a short delay, redirect to the appropriate game page with the game data
+      setTimeout(() => {
+        if (data.type === "mcq") {
+          router.push(`/play/mcq/${game.id}?data=${gameData}`);
+        } else if (data.type === "open_ended") {
+          router.push(`/play/open-ended/${game.id}?data=${gameData}`);
         }
-      },
-      onSuccess: ({ gameId }: { gameId: string }) => {
-        setFinishedLoading(true);
-        setTimeout(() => {
-          if (form.getValues("type") === "mcq") {
-            router.push(`/play/mcq/${gameId}`);
-          } else if (form.getValues("type") === "open_ended") {
-            router.push(`/play/open-ended/${gameId}`);
-          }
-        }, 2000);
-      },
-    });
+      }, 1500);
+    } catch (error) {
+      console.error("Error generating quiz:", error);
+      setShowLoader(false);
+
+      toast({
+        title: "Error Creating Quiz",
+        description: "An error occurred while generating questions. Please try again with a different topic.",
+        variant: "destructive",
+      });
+    }
   };
   form.watch();
 
@@ -144,12 +198,75 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name="difficulty"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Difficulty Level</FormLabel>
+                    <div className="w-full">
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm font-medium">Beginner</span>
+                        <span className="text-sm font-medium">Intermediate</span>
+                        <span className="text-sm font-medium">Professional</span>
+                      </div>
+                      <div className="flex justify-between w-full">
+                        <Button
+                          type="button"
+                          variant={field.value === "beginner" ? "default" : "outline"}
+                          className={`w-1/3 rounded-none rounded-l-lg ${
+                            field.value === "beginner"
+                              ? "bg-primary hover:bg-primary/90 text-white"
+                              : "border-primary text-primary hover:bg-secondary/20"
+                          }`}
+                          onClick={() => form.setValue("difficulty", "beginner")}
+                        >
+                          Beginner
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={field.value === "intermediate" ? "default" : "outline"}
+                          className={`w-1/3 rounded-none ${
+                            field.value === "intermediate"
+                              ? "bg-primary hover:bg-primary/90 text-white"
+                              : "border-primary text-primary hover:bg-secondary/20"
+                          }`}
+                          onClick={() => form.setValue("difficulty", "intermediate")}
+                        >
+                          Intermediate
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={field.value === "professional" ? "default" : "outline"}
+                          className={`w-1/3 rounded-none rounded-r-lg ${
+                            field.value === "professional"
+                              ? "bg-primary hover:bg-primary/90 text-white"
+                              : "border-primary text-primary hover:bg-secondary/20"
+                          }`}
+                          onClick={() => form.setValue("difficulty", "professional")}
+                        >
+                          Professional
+                        </Button>
+                      </div>
+                    </div>
+                    <FormDescription>
+                      Select the difficulty level for your quiz questions.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className="flex justify-between">
                 <Button
                   variant={
                     form.getValues("type") === "mcq" ? "default" : "secondary"
                   }
-                  className="w-1/2 rounded-none rounded-l-lg"
+                  className={`w-1/2 rounded-none rounded-l-lg ${
+                    form.getValues("type") === "mcq"
+                      ? "bg-primary hover:bg-primary/90 text-white"
+                      : "bg-secondary hover:bg-secondary/80 text-primary"
+                  }`}
                   onClick={() => {
                     form.setValue("type", "mcq");
                   }}
@@ -164,15 +281,23 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                       ? "default"
                       : "secondary"
                   }
-                  className="w-1/2 rounded-none rounded-r-lg"
+                  className={`w-1/2 rounded-none rounded-r-lg ${
+                    form.getValues("type") === "open_ended"
+                      ? "bg-primary hover:bg-primary/90 text-white"
+                      : "bg-secondary hover:bg-secondary/80 text-primary"
+                  }`}
                   onClick={() => form.setValue("type", "open_ended")}
                   type="button"
                 >
                   <BookOpen className="w-4 h-4 mr-2" /> Open Ended
                 </Button>
               </div>
-              <Button disabled={isLoading} type="submit">
-                Submit
+              <Button
+                disabled={isLoading}
+                type="submit"
+                className="bg-primary hover:bg-primary/90 text-white"
+              >
+                Create Quiz
               </Button>
             </form>
           </Form>

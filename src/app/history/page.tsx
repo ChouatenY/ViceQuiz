@@ -1,6 +1,5 @@
 import HistoryComponent from "@/components/HistoryComponent";
 import { getAuthSession } from "@/lib/nextauth";
-import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
 import Link from "next/link";
@@ -10,10 +9,8 @@ import { LucideLayoutDashboard } from "lucide-react";
 type Props = {};
 
 const History = async (props: Props) => {
+  // Get the local user session
   const session = await getAuthSession();
-  if (!session?.user) {
-    return redirect("/");
-  }
   return (
     <div className="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[400px]">
       <Card>

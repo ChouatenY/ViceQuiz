@@ -4,7 +4,6 @@ import HotTopicsCard from "@/components/dashboard/HotTopicsCard";
 import QuizMeCard from "@/components/dashboard/QuizMeCard";
 import RecentActivityCard from "@/components/dashboard/RecentActivityCard";
 import { getAuthSession } from "@/lib/nextauth";
-import { redirect } from "next/navigation";
 import React from "react";
 
 type Props = {};
@@ -15,10 +14,8 @@ export const metadata = {
 };
 
 const Dasboard = async (props: Props) => {
+  // Get the local user session
   const session = await getAuthSession();
-  if (!session?.user) {
-    redirect("/");
-  }
 
   return (
     <main className="p-8 mx-auto max-w-7xl">
