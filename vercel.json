@@ -8,5 +8,13 @@
   "env": {
     "GEMINI_API_KEY": "AIzaSyC3p0HW2dXQAjwKOHVoP7j_Y2uvvSVRjVY",
     "NEXTAUTH_SECRET": "quizzy-app-secret-key-for-production"
+  },
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 10
+    },
+    "api/**/*.js": {
+      "maxDuration": 10
+    }
   }
 }
