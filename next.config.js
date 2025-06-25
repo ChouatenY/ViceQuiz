@@ -9,7 +9,9 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  output: "standalone",
+  experimental: {
+    serverComponentsExternalPackages: ["string-similarity"],
+  },
 };
 
 module.exports = nextConfig;

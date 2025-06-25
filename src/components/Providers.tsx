@@ -1,20 +1,21 @@
 "use client";
 import React from "react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { type ThemeProviderProps } from "next-themes/dist/types";
 import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
 import LocalUserProvider from "./LocalUserProvider";
+
 const queryClient = new QueryClient();
 
-const Providers = ({ children }: ThemeProviderProps) => {
+interface ProvidersProps {
+  children: React.ReactNode;
+}
+
+const Providers = ({ children }: ProvidersProps) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
-        <LocalUserProvider>{children}</LocalUserProvider>
-      </NextThemesProvider>
+      <LocalUserProvider>{children}</LocalUserProvider>
     </QueryClientProvider>
   );
 };

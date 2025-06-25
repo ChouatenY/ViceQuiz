@@ -145,164 +145,184 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
   }
 
   return (
-    <div className="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Quiz Creation</CardTitle>
-          <CardDescription>Choose a topic</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="topic"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Topic</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter a topic" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Please provide any topic you would like to be quizzed on
-                      here.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Number of Questions</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="How many questions?"
-                        type="number"
-                        {...field}
-                        onChange={(e) => {
-                          form.setValue("amount", parseInt(e.target.value));
-                        }}
-                        min={1}
-                        max={10}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      You can choose how many questions you would like to be
-                      quizzed on here.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <div className="min-h-screen bg-gradient-to-br from-secondary/20 to-white flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl">
+        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-500">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-3xl font-bold text-primary mb-2">Create Your Quiz</CardTitle>
+            <CardDescription className="text-lg text-muted-foreground">
+              Generate AI-powered questions on any topic
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-8 pb-8">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                  control={form.control}
+                  name="topic"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel className="text-base font-semibold text-primary">Topic</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter a topic (e.g., React, World History, Mathematics)"
+                          {...field}
+                          className="h-12 text-base border-2 border-secondary focus:border-primary transition-colors duration-200"
+                        />
+                      </FormControl>
+                      <FormDescription className="text-sm text-muted-foreground">
+                        Enter any topic you'd like to be quizzed on. The AI will generate relevant questions.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel className="text-base font-semibold text-primary">Number of Questions</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter number (1-10)"
+                          type="number"
+                          {...field}
+                          onChange={(e) => {
+                            form.setValue("amount", parseInt(e.target.value));
+                          }}
+                          min={1}
+                          max={10}
+                          className="h-12 text-base border-2 border-secondary focus:border-primary transition-colors duration-200"
+                        />
+                      </FormControl>
+                      <FormDescription className="text-sm text-muted-foreground">
+                        Choose between 1-10 questions for your quiz.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="difficulty"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Difficulty Level</FormLabel>
-                    <div className="w-full">
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm font-medium">Beginner</span>
-                        <span className="text-sm font-medium">Intermediate</span>
-                        <span className="text-sm font-medium">Professional</span>
+                <FormField
+                  control={form.control}
+                  name="difficulty"
+                  render={({ field }) => (
+                    <FormItem className="space-y-4">
+                      <FormLabel className="text-base font-semibold text-primary">Difficulty Level</FormLabel>
+                      <div className="w-full space-y-3">
+                        <div className="grid grid-cols-3 gap-3">
+                          <Button
+                            type="button"
+                            variant={field.value === "beginner" ? "default" : "outline"}
+                            className={`h-12 transition-all duration-300 transform hover:scale-105 ${
+                              field.value === "beginner"
+                                ? "bg-primary hover:bg-primary/90 text-white shadow-lg"
+                                : "border-2 border-primary text-primary hover:bg-secondary/30"
+                            }`}
+                            onClick={() => form.setValue("difficulty", "beginner")}
+                          >
+                            🌱 Beginner
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={field.value === "intermediate" ? "default" : "outline"}
+                            className={`h-12 transition-all duration-300 transform hover:scale-105 ${
+                              field.value === "intermediate"
+                                ? "bg-primary hover:bg-primary/90 text-white shadow-lg"
+                                : "border-2 border-primary text-primary hover:bg-secondary/30"
+                            }`}
+                            onClick={() => form.setValue("difficulty", "intermediate")}
+                          >
+                            🎯 Intermediate
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={field.value === "professional" ? "default" : "outline"}
+                            className={`h-12 transition-all duration-300 transform hover:scale-105 ${
+                              field.value === "professional"
+                                ? "bg-primary hover:bg-primary/90 text-white shadow-lg"
+                                : "border-2 border-primary text-primary hover:bg-secondary/30"
+                            }`}
+                            onClick={() => form.setValue("difficulty", "professional")}
+                          >
+                            🚀 Professional
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex justify-between w-full">
-                        <Button
-                          type="button"
-                          variant={field.value === "beginner" ? "default" : "outline"}
-                          className={`w-1/3 rounded-none rounded-l-lg ${
-                            field.value === "beginner"
-                              ? "bg-primary hover:bg-primary/90 text-white"
-                              : "border-primary text-primary hover:bg-secondary/20"
-                          }`}
-                          onClick={() => form.setValue("difficulty", "beginner")}
-                        >
-                          Beginner
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={field.value === "intermediate" ? "default" : "outline"}
-                          className={`w-1/3 rounded-none ${
-                            field.value === "intermediate"
-                              ? "bg-primary hover:bg-primary/90 text-white"
-                              : "border-primary text-primary hover:bg-secondary/20"
-                          }`}
-                          onClick={() => form.setValue("difficulty", "intermediate")}
-                        >
-                          Intermediate
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={field.value === "professional" ? "default" : "outline"}
-                          className={`w-1/3 rounded-none rounded-r-lg ${
-                            field.value === "professional"
-                              ? "bg-primary hover:bg-primary/90 text-white"
-                              : "border-primary text-primary hover:bg-secondary/20"
-                          }`}
-                          onClick={() => form.setValue("difficulty", "professional")}
-                        >
-                          Professional
-                        </Button>
+                      <FormDescription className="text-sm text-muted-foreground">
+                        Choose the difficulty level that matches your expertise.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="space-y-4">
+                  <label className="text-base font-semibold text-primary">Quiz Type</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button
+                      variant={
+                        form.getValues("type") === "mcq" ? "default" : "secondary"
+                      }
+                      className={`h-16 transition-all duration-300 transform hover:scale-105 ${
+                        form.getValues("type") === "mcq"
+                          ? "bg-primary hover:bg-primary/90 text-white shadow-lg"
+                          : "bg-secondary hover:bg-secondary/80 text-primary border-2 border-primary/20"
+                      }`}
+                      onClick={() => {
+                        form.setValue("type", "mcq");
+                      }}
+                      type="button"
+                    >
+                      <div className="flex flex-col items-center space-y-1">
+                        <CopyCheck className="w-5 h-5" />
+                        <span className="text-sm font-medium">Multiple Choice</span>
                       </div>
+                    </Button>
+                    <Button
+                      variant={
+                        form.getValues("type") === "open_ended"
+                          ? "default"
+                          : "secondary"
+                      }
+                      className={`h-16 transition-all duration-300 transform hover:scale-105 ${
+                        form.getValues("type") === "open_ended"
+                          ? "bg-primary hover:bg-primary/90 text-white shadow-lg"
+                          : "bg-secondary hover:bg-secondary/80 text-primary border-2 border-primary/20"
+                      }`}
+                      onClick={() => form.setValue("type", "open_ended")}
+                      type="button"
+                    >
+                      <div className="flex flex-col items-center space-y-1">
+                        <BookOpen className="w-5 h-5" />
+                        <span className="text-sm font-medium">Open Ended</span>
+                      </div>
+                    </Button>
+                  </div>
+                </div>
+
+                <Button
+                  disabled={isLoading}
+                  type="submit"
+                  className="w-full h-14 bg-primary hover:bg-primary/90 text-white text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>Creating Quiz...</span>
                     </div>
-                    <FormDescription>
-                      Select the difficulty level for your quiz questions.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex justify-between">
-                <Button
-                  variant={
-                    form.getValues("type") === "mcq" ? "default" : "secondary"
-                  }
-                  className={`w-1/2 rounded-none rounded-l-lg ${
-                    form.getValues("type") === "mcq"
-                      ? "bg-primary hover:bg-primary/90 text-white"
-                      : "bg-secondary hover:bg-secondary/80 text-primary"
-                  }`}
-                  onClick={() => {
-                    form.setValue("type", "mcq");
-                  }}
-                  type="button"
-                >
-                  <CopyCheck className="w-4 h-4 mr-2" /> Multiple Choice
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <span>🚀 Create Quiz</span>
+                    </div>
+                  )}
                 </Button>
-                <Separator orientation="vertical" />
-                <Button
-                  variant={
-                    form.getValues("type") === "open_ended"
-                      ? "default"
-                      : "secondary"
-                  }
-                  className={`w-1/2 rounded-none rounded-r-lg ${
-                    form.getValues("type") === "open_ended"
-                      ? "bg-primary hover:bg-primary/90 text-white"
-                      : "bg-secondary hover:bg-secondary/80 text-primary"
-                  }`}
-                  onClick={() => form.setValue("type", "open_ended")}
-                  type="button"
-                >
-                  <BookOpen className="w-4 h-4 mr-2" /> Open Ended
-                </Button>
-              </div>
-              <Button
-                disabled={isLoading}
-                type="submit"
-                className="bg-primary hover:bg-primary/90 text-white"
-              >
-                Create Quiz
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
