@@ -17,7 +17,7 @@ const Navbar = () => {
               className="mr-2"
             />
             <p className="text-xl font-bold text-primary">
-              Quizzzy
+              Vice Quiz
             </p>
           </div>
         </Link>
